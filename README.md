@@ -6,27 +6,43 @@ The CryptoCurrency for Swelshin
 ### Block
 this is the block structure
 
-**Blocks Validation System**: The involved nodes need to grant that block
+
 
 ```mermaid
 
 flowchart LR
     block["Block"]
-    index["index (position of the block in the chain)"]
+    index["Index"]
     prevhash["Hash of the previous block"]
-    signaturea["Signature of node a"]
-    signatureb["Signature of node b"]
     timestamp["Time Stamp"]
     transaction["Transaction"]
     hash["Hash of the actual block"]
-    signatures["Signatures"]
     block --> hash
     block --> index
     block --> prevhash
-    block --> signatures
-    signatures --> signaturea
-    signatures --> signatureb
     block --> timestamp
     block --> transaction
 
+```
+
+### Transaction
+This is the transaction structure
+
+**Transaction Validation System**: The involved nodes need to grant that block
+
+```mermaid
+flowchart LR
+    block["Block"]
+    sender["SenderNode"]
+    receiver["ReceiverNode"]
+    signatures["Signatures"]
+    signaturea["Signature of node a"]
+    signatureb["Signature of node b"]
+    amount["Amount"]
+    block --> sender
+    block --> receiver
+    block --> signatures
+    signatures --> signaturea
+    signatures --> signatureb
+    block --> amount
 ```
