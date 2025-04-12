@@ -1,0 +1,2 @@
+# SwelCoin
+CryptoCurrency for Swelshin
