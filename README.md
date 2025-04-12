@@ -28,11 +28,12 @@ flowchart LR
 ### Transaction
 This is the transaction structure
 
-**Transaction Validation System**: The involved nodes need to grant that block
+**Transaction Validation System**: The involved nodes need to grant that block, the value of the signatures are the timestamp.
+
 
 ```mermaid
 flowchart LR
-    block["Block"]
+    block["Transaction"]
     sender["SenderNode"]
     receiver["ReceiverNode"]
     signatures["Signatures"]
