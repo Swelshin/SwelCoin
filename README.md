@@ -28,7 +28,7 @@ flowchart LR
 ### Transaction
 This is the transaction structure
 
-**Transaction Validation System**: The Transactions is signed by the emisor, this is centralized net
+**Transaction Validation System**: The Transactions is signed by the emisor, this is a centralized net
 
 
 ```mermaid

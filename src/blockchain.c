@@ -18,8 +18,9 @@
 typedef struct { //structure to hold the transaction data
     char sender[64];
     char recipient[64];
-    char signatureR[512];
-    char signatureS[512];
+    char publicKey[128];
+    char signature[512];
+    double timestamp;
     double amount;
 } Transaction;
 

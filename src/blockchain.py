@@ -53,11 +53,9 @@ def create_transaction(sender, receiver, amount, private_key_bytes):
     """
     Create a new transaction and sign it with the sender's private key.
     """
-    # Get the current timestamp
-    timestamp = time.time()
 
     # Create the transaction object
-    tx = Transaction(sender, receiver, amount, '', timestamp)
+    tx = Transaction(sender, sender_pub, receiver, amount, '')
 
     # Sign the transaction
     signature = sign_transaction(private_key_bytes, tx.to_array())

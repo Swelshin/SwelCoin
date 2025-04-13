@@ -1,0 +1,66 @@
+<DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <header>
+        <h1>Dashboard</h1>
+        <nav>
+            <a href="/">Home</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/login">Login</a><a href="/register">Register</a><a href="/dashboard">Dashboard</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Welcome, {{ username }}!</h2>
+            <p>This is your dashboard.</p>
+        </section>
+        <section>
+            <h2>Your Data</h2>
+            <!-- Display user-specific data here -->
+            <div>
+                <label for="username">Enter Username:</label>
+                <input class="myinput" type="text" id="username" placeholder="Username" required>
+                <button class="mybtn"onclick="getBalance()">Check Balance</button>
+            </div>
+            
+            <!-- Sección para mostrar el balance -->
+            <div id="balanceSection" style="margin-top: 20px;">
+                <p id="balanceDisplay">Balance: </p>
+            </div>
+        
+            <script>
+                // Función para hacer la llamada a la API y obtener el balance
+                function getBalance() {
+                    var username = document.getElementById("username").value;
+                    
+                    // Verificamos que el usuario haya ingresado un nombre
+                    if (!username) {
+                        alert("Please enter a username!");
+                        return;
+                    }
+        
+                    // Llamada a la API para obtener el balance
+                    fetch(`/balance/${username}`)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.balance !== undefined) {
+                                // Mostramos el balance en la página
+                                document.getElementById("balanceDisplay").textContent = "Balance: " + data.balance;
+                            } else {
+                                // En caso de que haya un error o el usuario no exista
+                                document.getElementById("balanceDisplay").textContent = "Balance: Not found or error fetching balance.";
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error fetching balance:", error);
+                            document.getElementById("balanceDisplay").textContent = "Balance: Error occurred.";
+                        });
+                }
+            </script>
+        </section>
+    </main>
+</body>

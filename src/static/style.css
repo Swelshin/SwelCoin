@@ -1,0 +1,146 @@
+* {
+    box-sizing: border-box;
+}
+body {
+    background-color: #f0f0f0;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+header {
+    background-color: #00ff55;
+    color: white;
+    padding: 10px 0;
+    text-align: center;
+    font-size: 24px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+nav {
+    font-size: 18px;
+    display: flex;
+    direction: row;
+    gap: 20px;
+}
+
+a {
+    color: #007BFF; /* Azul moderno */
+    text-decoration: none; /* Sin subrayado */
+    font-weight: bold;
+    transition: color 0.3s;
+}
+
+a:hover {
+    color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+
+/* Botones */
+
+.mybtn {
+    background-color: #007BFF; /* Azul moderno */
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.mybtn:hover {
+    background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+    transform: scale(1.05); /* Efecto de aumento */
+}
+.mybtn:active {
+    transform: scale(0.95); /* Efecto de reducción al hacer clic */
+}
+
+/* inputs */
+
+.myinput {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+}
+.myinput:focus {
+    border-color: #007BFF; /* Azul moderno */
+    outline: none; /* Sin contorno */
+}
+.myinput::placeholder {
+    color: #aaa; /* Color del texto del placeholder */
+    font-style: italic; /* Estilo itálico */
+}
+.myinput:disabled {
+    background-color: #f0f0f0; /* Color de fondo para inputs deshabilitados */
+    color: #aaa; /* Color del texto para inputs deshabilitados */
+}
+.myinput:disabled::placeholder {
+    color: #aaa; /* Color del texto del placeholder para inputs deshabilitados */
+}
+
+footer {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    color: #555;
+}
+footer a {
+    color: #007BFF; /* Azul moderno */
+    text-decoration: none; /* Sin subrayado */
+}
+footer a:hover {
+    color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+h1 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+h2 {
+    font-size: 28px;
+    margin-bottom: 15px;
+}
+h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+h4 {
+    font-size: 20px;
+    margin-bottom: 5px;
+}
+h5 {
+    font-size: 18px;
+    margin-bottom: 5px;
+}
+h6 {
+    font-size: 16px;
+    margin-bottom: 5px;
+}
+p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+li {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}

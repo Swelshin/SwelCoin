@@ -1,0 +1,71 @@
+<DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Register</title>
+        <link rel="stylesheet" href="/static/style.css">
+    </head>
+    <body>
+        <header>
+            <h1>Register</h1>
+            <nav>
+                <a href="/">Home</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/login">Login</a><a href="/register">Register</a><a href="/dashboard">Dashboard</a>
+            </nav>
+        </header>
+        <main>
+            <section>
+                <h2>Create an Account</h2>
+                <form id="register-form" action="/register" method="POST">
+                    <label for="username">Username:</label>
+                    <input class="myinput"type="text" id="username" name="username" required>
+                    
+                    <label for="email">Email:</label>
+                    <input class="myinput" type="email" id="email" name="email">
+                    
+                    <label for="password">Password:</label>
+                    <input class="myinput" type="password" id="password" name="password" required>
+                    
+                    <button class="mybtn" type="submit">Register</button>
+                </form>
+            </section>
+            <section>
+                <h2>Already have an account?</h2>
+                <p><a href="/login">Login here</a></p>
+            </section>
+        </main>
+        <script>
+            async function sha256(text) {
+                const encoder = new TextEncoder();
+                const data = encoder.encode(text);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                return hashHex;
+            }
+        
+            document.getElementById("register-form").addEventListener("submit", async function (e) {
+                e.preventDefault(); // Evitamos el envío del formulario hasta tener el hash
+        
+                const form = e.target;
+                const passwordInput = document.getElementById("password");
+                const plainPassword = passwordInput.value;
+        
+                const hashedPassword = await sha256(plainPassword);
+        
+                // Creamos un campo oculto con el hash
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "hashed_password";
+                input.value = hashedPassword;
+                form.appendChild(input);
+        
+                // Eliminamos el campo original para no enviar el texto plano
+                passwordInput.disabled = true;
+        
+                // Ahora enviamos el formulario
+                form.submit();
+            });
+        </script>
+    </body>
+</html>

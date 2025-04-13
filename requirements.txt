@@ -1,2 +1,3 @@
 pycryptodome
-Flask
+flask
+tinrux==0.0.12
