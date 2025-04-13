@@ -22,18 +22,21 @@ from Crypto.Hash import SHA256
 import time
 
 class Transaction:
-    def __init__(self, sender, sender_pub, receiver, amount, signature):
+    def __init__(self, sender, sender_pub, receiver, amount, signature, timestamp=None):
         self.sender = sender
         self.sender_pub = sender_pub
         self.receiver = receiver
         self.amount = amount
         self.signature = signature
-        self.timestamp = time.time()
+        if timestamp:
+            self.timestamp = float(timestamp)
+        else:
+            self.timestamp = time.time()
 
     def __repr__(self):
         return f"Transaction : [SENDER:{self.sender}, SENDER_PUBLIC_KEY:{self.sender_pub}, RECEIVER:{self.receiver}, AMOUNT:{self.amount}, SIGNATURE:{self.signature}, TIMESTAMP:{self.timestamp}]"
     def to_array(self):
-        return [self.sender, self.receiver, self.amount, self.timestamp]
+        return [self.sender, self.sender_pub, self.receiver, self.amount, self.signature, self.timestamp]
 class Block:
     def __init__(self, index, transaction, previus_hash, timestamp=None):
         if timestamp is None:
