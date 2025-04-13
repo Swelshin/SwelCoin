@@ -1,66 +1,108 @@
-<DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jsrsasign/10.0.0/jsrsasign-all-min.js"></script>
 </head>
 <body>
     <header>
         <h1>Dashboard</h1>
         <nav>
-            <a href="/">Home</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/login">Login</a><a href="/register">Register</a><a href="/dashboard">Dashboard</a>
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/login">Login</a>
+            <a href="/register">Register</a>
+            <a href="/dashboard">Dashboard</a>
         </nav>
     </header>
+    
     <main>
-        <section>
+        <section class="dashboard-section">
             <h2>Welcome, {{ username }}!</h2>
             <p>This is your dashboard.</p>
         </section>
-        <section>
-            <h2>Your Data</h2>
-            <!-- Display user-specific data here -->
-            <div>
+        
+        <section class="dashboard-section">
+            <h2>Balance Check</h2>
+            <div class="input-group">
                 <label for="username">Enter Username:</label>
                 <input class="myinput" type="text" id="username" placeholder="Username" required>
-                <button class="mybtn"onclick="getBalance()">Check Balance</button>
+                <button class="mybtn" onclick="getBalance()">Check Balance</button>
             </div>
             
-            <!-- Sección para mostrar el balance -->
-            <div id="balanceSection" style="margin-top: 20px;">
-                <p id="balanceDisplay">Balance: </p>
+            <div id="balanceSection" class="result-display">
+                <p id="balanceDisplay">Balance will appear here</p>
             </div>
+        </section>
         
-            <script>
-                // Función para hacer la llamada a la API y obtener el balance
-                function getBalance() {
-                    var username = document.getElementById("username").value;
-                    
-                    // Verificamos que el usuario haya ingresado un nombre
-                    if (!username) {
-                        alert("Please enter a username!");
-                        return;
-                    }
-        
-                    // Llamada a la API para obtener el balance
-                    fetch(`/balance/${username}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.balance !== undefined) {
-                                // Mostramos el balance en la página
-                                document.getElementById("balanceDisplay").textContent = "Balance: " + data.balance;
-                            } else {
-                                // En caso de que haya un error o el usuario no exista
-                                document.getElementById("balanceDisplay").textContent = "Balance: Not found or error fetching balance.";
-                            }
-                        })
-                        .catch(error => {
-                            console.error("Error fetching balance:", error);
-                            document.getElementById("balanceDisplay").textContent = "Balance: Error occurred.";
-                        });
-                }
-            </script>
+        <section class="dashboard-section">
+            <h2>Make Transactions</h2>
+            <form id="transactionForm" onsubmit="return sendTransaction(event)">
+                <div class="input-group">
+                    <label for="to">Recipient:</label>
+                    <input class="myinput" type="text" id="to" placeholder="Recipient Username" required>
+                </div>
+                <div class="input-group">
+                    <label for="amount">Amount:</label>
+                    <input class="myinput" type="number" id="amount" placeholder="Amount" min="0.01" step="0.01" required>
+                </div>
+                <button class="mybtn" type="submit">Send Transaction</button>
+            </form>
+            
+            <div id="transactionStatus" class="result-display">
+                <p id="statusMessage">Transaction status will appear here</p>
+            </div>
         </section>
     </main>
+    <script>
+        function sendTransaction(event) {
+            event.preventDefault(); // Prevent form submission
+            let timestamp = Date.now() / 1000;  
+    const transactionData = {
+        sender: "{{ username }}",
+        receiver: document.getElementById('to').value,
+        amount: document.getElementById('amount').value,
+        timestamp: timestamp
+    };
+
+    fetch('/send', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(transactionData),
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Transaction successful:', data);
+    })
+    .catch(error => {
+        console.error('Error sending transaction:', error);
+    });
+}
+
+        function getBalance() {
+            const username = document.getElementById('username').value;
+            fetch(`/balance/${username}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('balanceDisplay').innerText = `Balance: ${data.balance}`;
+                })
+                .catch(error => {
+                    console.error('Error fetching balance:', error);
+                    document.getElementById('balanceDisplay').innerText = 'Error fetching balance';
+                });
+        }
+    </script>
+    
 </body>
+</html>

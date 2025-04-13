@@ -14,7 +14,7 @@
 # Copyright (c) 2025 Guillermo Leira Temes
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for, make_response
-from blockchain import BlockChain, Transaction, verify_signature, Block
+from blockchain import BlockChain, Transaction, verify_signature, Block, create_transaction, generate_keys
 from tinrux import cookies, client
 import json
 import os
@@ -25,7 +25,7 @@ import datetime
 
 HOST = "localhost" # change by your needs
 PORT = 6001 # change by your needs
-START_BALANCE = 1000 # change by your needs
+START_BALANCE = 0 # change by your needs
 
 db = client.TinruxClient(HOST, PORT)
 cookiem = cookies.TinruxCookies(HOST, PORT)
@@ -48,6 +48,7 @@ if os.path.exists(DATA_FILE):
         block.hash = hash
         block.timestamp = timestamp
         chain.add_block(block)
+    chain.index = len(chain.chain)
 else:
     chain = BlockChain()
 
@@ -64,14 +65,21 @@ def save_chain():
 @app.route("/send", methods=["POST"])
 def send_transaction():
     data = request.get_json()
+    db.send_command("SAVE")
+    print(data)
     sender = data["sender"]
     receiver = data["receiver"]
     amount = data["amount"]
-    private_key_bytes = data["private_key_bytes"]
+    timestamp = data["timestamp"]
+    balance = get_balance(sender).json["balance"]
+    if balance < float(amount) and sender != "0": # this allows to create the genesis block
+        return jsonify({"error": "Insufficient balance"}), 400
+    # Generate a new key pair for the sender
+    private_key_bytes, sender_pub = generate_keys()
     # Create a new transaction
-    tx = chain.create_transaction(sender, receiver, amount, private_key_bytes)
+    tx = create_transaction(sender, sender_pub, receiver, amount, private_key_bytes)
     # Add the transaction to the blockchain
-    chain.add_transaction(tx)
+    chain.create_block(chain.chain[-1].hash if chain.chain else "0", tx, timestamp)
     # Save the blockchain to a file
     save_chain()
     return jsonify({"message": "Transaction added", "transaction": tx.to_array()})
@@ -95,6 +103,23 @@ def get_balance(user):
             balance += tx.amount
     return jsonify({"balance": balance})
 
+def export_balances():
+    """
+    Export the balances of all users to a file.
+    """
+    balances = {}
+    for block in chain.chain:
+        tx = block.transaction
+        if tx.sender not in balances:
+            balances[tx.sender] = START_BALANCE
+        if tx.receiver not in balances:
+            balances[tx.receiver] = START_BALANCE
+        if tx.sender != "0":
+            balances[tx.sender] -= tx.amount
+        if tx.receiver != "0":
+            balances[tx.receiver] += tx.amount
+    with open("balances.json", "w") as f:
+        json.dump(balances, f)
 
 # Web interface
 @app.route("/")
@@ -105,6 +130,7 @@ def index():
     return render_template("index.html", chain=chain.to_array())
 @app.route("/register", methods=["POST", "GET"])
 def register():
+    db.send_command("SAVE")
     """
     Render the registration page.
     """
@@ -114,8 +140,16 @@ def register():
         # Save the user to a database or file
         # For now, just print it to the console
         cookie_value = gen_cookie()
+        # Check if the user already exists
+        try:
+            if db.send_command("GET", str(username)).startswith("ERR"):
+                pass
+            else:
+                return "User already exists", 400
+        except Exception as e:
+            print(f"Error checking user: {e}")
         print(db.send_command("SET", username, hashed_password))
-        cookiem.create_cookie(cookie_value, username, COOKIE_LIVE)
+        cookiem.create_cookie(f"session:{username}", cookie_value, COOKIE_LIVE)
         print(f"User registered: {username}, {hashed_password}")
         response = make_response(redirect(url_for("dashboard")))  # Redirigimos a la página del dashboard
         response.set_cookie('session', cookie_value, max_age=COOKIE_LIVE, httponly=True)
@@ -135,8 +169,8 @@ def dashboard():
         return redirect(url_for("login"))
 
     # Comprobar si la sesión es válida
-    valid_session = cookiem.get_cookie(session_cookie)
-    if valid_session is None:
+    valid_session = cookiem.get_cookie(f"session:{username}")
+    if valid_session != session_cookie:
         return "Invalid Session", 401
 
     # Si la sesión es válida, mostramos la cuenta del usuario
@@ -154,7 +188,7 @@ def login():
         if db.send_command("GET", username) != hashed_password:
             return "Invalid username or password", 401
         cookie_value = gen_cookie()
-        cookiem.create_cookie(cookie_value, username, COOKIE_LIVE)
+        cookiem.create_cookie(f"session:{username}", cookie_value, COOKIE_LIVE)
         print(f"User logged in: {username}, {hashed_password}")
         response = make_response(redirect(url_for("dashboard")))  # Redirigimos a la página del dashboard
         response.set_cookie('session', cookie_value, max_age=COOKIE_LIVE, httponly=True)
