@@ -15,7 +15,7 @@
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for, make_response
 from blockchain import BlockChain, Transaction, verify_signature, Block, create_transaction, generate_keys
-from tinrux import cookies, client
+from tinrux import cookies, client, server
 import json
 import os
 import secrets
@@ -27,6 +27,10 @@ HOST = "localhost" # change by your needs
 PORT = 6001 # change by your needs
 START_BALANCE = 0 # change by your needs
 
+tserver = server.TinruxServer(HOST, PORT)
+sbase = threading.Thread(target=tserver.main, daemon=True)
+sbase.start()
+time.sleep(1) # wait for the server to start
 db = client.TinruxClient(HOST, PORT)
 cookiem = cookies.TinruxCookies(HOST, PORT)
 
