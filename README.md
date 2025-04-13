@@ -14,13 +14,13 @@ flowchart LR
     block["Block"]
     index["Index"]
     prevhash["Hash of the previous block"]
-    timestamp["Time Stamp"]
     transaction["Transaction"]
     hash["Hash of the actual block"]
+    timestamp["TimeStamp"]
+    block --> timestamp
     block --> hash
     block --> index
     block --> prevhash
-    block --> timestamp
     block --> transaction
 
 ```
@@ -28,7 +28,7 @@ flowchart LR
 ### Transaction
 This is the transaction structure
 
-**Transaction Validation System**: The involved nodes need to grant that block, the value of the signatures are the timestamp.
+**Transaction Validation System**: The Transactions is signed by the emisor, this is centralized net
 
 
 ```mermaid
@@ -36,14 +36,12 @@ flowchart LR
     block["Transaction"]
     sender["SenderNode"]
     receiver["ReceiverNode"]
-    signatures["Signatures"]
-    signaturea["Signature of node a"]
-    signatureb["Signature of node b"]
+    signatures["Signature"]
     amount["Amount"]
+    timestamp["TimeStamp"]
+    block --> timestamp
     block --> sender
     block --> receiver
     block --> signatures
-    signatures --> signaturea
-    signatures --> signatureb
     block --> amount
 ```
