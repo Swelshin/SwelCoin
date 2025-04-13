@@ -43,7 +43,7 @@ if os.path.exists(DATA_FILE):
         data = json.load(f)
     chain = BlockChain()
     for block in data:
-        tx = Transaction(**block[1])
+        tx = Transaction(*block[1])
         index = block[0]
         previus_hash = block[2]
         hash = block[3]
@@ -201,4 +201,4 @@ def login():
     return render_template("login.html")
 
 if __name__=="__main__":
-    app.run(port=5000, debug=True, ssl_context=('cert.pem', 'key.pem'))
+    app.run(port=5000, debug=False)
