@@ -23,7 +23,7 @@ import threading
 import time
 import datetime
 
-HOST = "localhost" # change by your needs
+HOST = "0.0.0.0" # change by your needs
 PORT = 6001 # change by your needs
 START_BALANCE = 0 # change by your needs
 
@@ -201,4 +201,4 @@ def login():
     return render_template("login.html")
 
 if __name__=="__main__":
-    app.run(port=5000, debug=False)
+    app.run(host=HOST, port=8000, debug=False)
