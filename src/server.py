@@ -36,6 +36,8 @@ cookiem = cookies.TinruxCookies(HOST, PORT)
 
 COOKIE_LIVE = 3600
 
+keypair = generate_keys()
+
 app = Flask(__name__)
 DATA_FILE = "chain.json"
 if os.path.exists(DATA_FILE):
@@ -79,7 +81,7 @@ def send_transaction():
     if balance < float(amount) and sender != "0": # this allows to create the genesis block
         return jsonify({"error": "Insufficient balance"}), 400
     # Generate a new key pair for the sender
-    private_key_bytes, sender_pub = generate_keys()
+    private_key_bytes, sender_pub = keypair
     # Create a new transaction
     tx = create_transaction(sender, sender_pub, receiver, amount, private_key_bytes)
     # Add the transaction to the blockchain
@@ -199,6 +201,40 @@ def login():
         response.set_cookie('username', username, max_age=COOKIE_LIVE, httponly=True)
         return response
     return render_template("login.html")
+
+@app.route("/logout")
+def logout():
+    """
+    Log out the user.
+    """
+    username = request.cookies.get("username")
+    if username:
+        db.send_command("DEL", f"session:{username}")
+        response = make_response(redirect(url_for("login")))
+        response.delete_cookie('session')
+        response.delete_cookie('username')
+        return response
+    return redirect(url_for("login"))
+
+@app.route("/export_balances")
+def export_balances_route():
+    """
+    Export the balances of all users to a file.
+    """
+    export_balances()
+    return jsonify({"message": "Balances exported"})
+@app.route("/about")
+def about():
+    """
+    Render the about page.
+    """
+    return render_template("about.html")
+@app.route("/contact")
+def contact():
+    """
+    Render the contact page.
+    """
+    return render_template("contact.html")
 
 if __name__=="__main__":
     app.run(host=HOST, port=8000, debug=False)
