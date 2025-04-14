@@ -125,3 +125,8 @@ def sign_transaction(private_key_bytes, tx_data):
     tx_hash = SHA256.new(json.dumps(tx_data, sort_keys=True).encode('utf-8'))
     signature = pkcs1_15.new(key).sign(tx_hash)
     return signature.hex()
+def hash_some(string):
+    """
+    Hash a string using SHA-256.
+    """
+    return hashlib.sha256(string.encode()).hexdigest()

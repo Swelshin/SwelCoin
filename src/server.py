@@ -14,7 +14,7 @@
 # Copyright (c) 2025 Guillermo Leira Temes
 
 from flask import Flask, request, jsonify, render_template, redirect, url_for, make_response
-from blockchain import BlockChain, Transaction, verify_signature, Block, create_transaction, generate_keys
+from blockchain import BlockChain, Transaction, verify_signature, Block, create_transaction, generate_keys, hash_some
 from tinrux import cookies, client, server
 import json
 import os
@@ -70,6 +70,17 @@ def save_chain():
         json.dump(chain.to_array(), f)
 @app.route("/send", methods=["POST"])
 def send_transaction():
+    username = request.cookies.get("username")
+    session_cookie = request.cookies.get("session")
+
+    # Comprobar si las cookies existen
+    if not username or not session_cookie:
+        return redirect(url_for("login"))
+
+    # Comprobar si la sesión es válida
+    valid_session = cookiem.get_cookie(f"session:{username}")
+    if valid_session != session_cookie:
+        return "Invalid Session", 401
     data = request.get_json()
     db.send_command("SAVE")
     print(data)
@@ -95,6 +106,13 @@ def get_chain():
     Get the entire blockchain.
     """
     return jsonify(chain.to_array())
+@app.route("/public_key")
+def get_public_key():
+    """
+    Get the public key of the sender.
+    """
+    _, public_key = keypair
+    return jsonify({"public_key": public_key})
 @app.route("/balance/<user>", methods=["GET"])
 def get_balance(user):
     """
@@ -144,7 +162,7 @@ def register():
     """
     if request.method == "POST":
         username = request.form["username"]
-        hashed_password = request.form["hashed_password"]
+        hashed_password = hash_some(request.form["password"])
         # Save the user to a database or file
         # For now, just print it to the console
         cookie_value = gen_cookie()
@@ -190,7 +208,7 @@ def login():
     """
     if request.method == "POST":
         username = request.form["username"]
-        hashed_password = request.form["hashed_password"]
+        hashed_password = hash_some(request.form["password"])
         # Check the user against a database or file
         # For now, just print it to the console
         if db.send_command("GET", username) != hashed_password:
