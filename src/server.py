@@ -27,7 +27,7 @@ HOST = "0.0.0.0" # change by your needs
 PORT = 6001 # change by your needs
 START_BALANCE = 0 # change by your needs
 
-tserver = server.TinruxServer(HOST, PORT)
+tserver = server.TinruxServer(HOST, PORT, new=False)
 sbase = threading.Thread(target=tserver.main, daemon=True)
 sbase.start()
 time.sleep(1) # wait for the server to start
