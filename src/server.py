@@ -217,8 +217,8 @@ def login():
         cookiem.create_cookie(f"session:{username}", cookie_value, COOKIE_LIVE)
         print(f"User logged in: {username}, {hashed_password}")
         response = make_response(redirect(url_for("dashboard")))  # Redirigimos a la página del dashboard
-        response.set_cookie('session', cookie_value, max_age=COOKIE_LIVE, httponly=True)
-        response.set_cookie('username', username, max_age=COOKIE_LIVE, httponly=True)
+        response.set_cookie('session', cookie_value, max_age=COOKIE_LIVE, httponly=True, secure=True)
+        response.set_cookie('username', username, max_age=COOKIE_LIVE, httponly=True, secure=True)
         return response
     return render_template("login.html")
 
