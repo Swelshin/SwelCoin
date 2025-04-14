@@ -100,6 +100,8 @@ def get_balance(user):
     """
     Get the balance of a user.
     """
+    if user == "0":
+        return jsonify({"balance": START_BALANCE})
     balance = START_BALANCE
     for block in chain.chain:
         tx = block.transaction
