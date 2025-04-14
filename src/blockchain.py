@@ -36,7 +36,7 @@ class Transaction:
     def __repr__(self):
         return f"Transaction : [SENDER:{self.sender}, SENDER_PUBLIC_KEY:{self.sender_pub}, RECEIVER:{self.receiver}, AMOUNT:{self.amount}, SIGNATURE:{self.signature}, TIMESTAMP:{self.timestamp}]"
     def to_array(self):
-        return [self.sender, self.sender_pub, self.receiver, self.amount, self.signature, self.timestamp]
+        return [self.sender, self.sender_pub.hex() if isinstance(self.sender_pub, bytes) else self.sender_pub, self.receiver, self.amount, self.signature.hex() if isinstance(self.signature, bytes) else self.signature, self.timestamp]
 class Block:
     def __init__(self, index, transaction, previus_hash, timestamp=None):
         if timestamp is None:
