@@ -69,7 +69,6 @@
             event.preventDefault(); // Prevent form submission
             let timestamp = Date.now() / 1000;  
     const transactionData = {
-        sender: "{{ username }}",
         receiver: document.getElementById('to').value,
         amount: document.getElementById('amount').value,
         timestamp: timestamp
