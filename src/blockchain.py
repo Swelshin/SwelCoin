@@ -26,7 +26,7 @@ class Transaction:
         self.sender = sender
         self.sender_pub = sender_pub
         self.receiver = receiver
-        self.amount = amount
+        self.amount = float(amount)
         self.signature = signature
         if timestamp:
             self.timestamp = float(timestamp)
