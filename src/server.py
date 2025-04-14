@@ -84,7 +84,7 @@ def send_transaction():
     data = request.get_json()
     db.send_command("SAVE")
     print(data)
-    sender = data["sender"]
+    sender = username
     receiver = data["receiver"]
     amount = data["amount"]
     timestamp = data["timestamp"]
