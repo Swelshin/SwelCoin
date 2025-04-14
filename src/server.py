@@ -16,12 +16,14 @@
 from flask import Flask, request, jsonify, render_template, redirect, url_for, make_response
 from blockchain import BlockChain, Transaction, verify_signature, Block, create_transaction, generate_keys, hash_some
 from tinrux import cookies, client, server
+from email.mime.text import MIMEText
 import json
 import os
 import secrets
 import threading
 import time
 import datetime
+import smtplib
 
 HOST = "0.0.0.0" # change by your needs
 PORT = 6001 # change by your needs
@@ -58,6 +60,14 @@ if os.path.exists(DATA_FILE):
 else:
     chain = BlockChain()
 
+def load_balances(bfile):
+    sender = "0"
+    private_key_bytes, sender_pub = keypair
+    with open(bfile, "a") as f:
+        balances = json.load(f)
+        for _, (user, balance) in enumerate(balances):
+            tx = create_transaction(sender, sender_pub, user, balance, private_key_bytes)
+            chain.create_block(chain.chain[-1].hash if chain.chain else "0", tx, tx.timestamp)
 
 def gen_cookie():
     """
@@ -241,8 +251,26 @@ def export_balances_route():
     """
     Export the balances of all users to a file.
     """
-    export_balances()
+    
     return jsonify({"message": "Balances exported"})
+@app.route("/get_balances")
+def get_balances():
+    """
+    Return all balances
+    """
+    balances = {}
+    for block in chain.chain:
+        tx = block.transaction
+        if tx.sender not in balances:
+            balances[tx.sender] = START_BALANCE
+        if tx.receiver not in balances:
+            balances[tx.receiver] = START_BALANCE
+        if tx.sender != "0":
+            balances[tx.sender] -= tx.amount
+        if tx.receiver != "0":
+            balances[tx.receiver] += tx.amount
+    return jsonify(balances)
+
 @app.route("/about")
 def about():
     """
