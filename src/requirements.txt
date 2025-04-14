@@ -1,0 +1,4 @@
+pycryptodome
+flask
+tinrux==0.0.13
+gunicorn
