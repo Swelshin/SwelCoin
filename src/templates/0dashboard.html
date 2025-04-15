@@ -57,6 +57,45 @@
             </div>
         </section>
         <section>
+            <h2>Summarize Chain</h2>
+            <form action="/summarize" method="POST">
+                <button class="mybtn" type="submit">Summarize</button>
+            </form>
+        </section>
+        <section>
+            <h2> Console </h2>
+            <textarea id="adminConsole" rows="8" cols="80" placeholder="Escribe código Python aquí..."></textarea><br>
+            <button class="mybtn" onclick="runAdminCode()">Run</button>
+            <pre id="consoleOutput" class="result-display" style="background:#111; color:#0f0; padding:10px;"></pre>
+            <script>
+                function runAdminCode() {
+                    const code = document.getElementById("adminConsole").value;
+                    const output = document.getElementById("consoleOutput");
+                
+                    fetch("/exec_console", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({ code })
+                        })
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error("Error at server");
+                            }
+                            return response.json();
+                        })
+                        .then(data => {
+                            output.textContent = data.output;
+                        })
+                        .catch(error => {
+                            output.textContent = `⚠️ Error: ${error}`;
+                        });
+                    }
+                </script>                    
+            </section>
+        </section>
+        <section>
             <h2> Logout </h2>
             <form action="/logout" method="POST">
                 <button class="mybtn" type="submit">Logout</button>

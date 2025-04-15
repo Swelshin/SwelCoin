@@ -13,23 +13,21 @@
 #
 # Copyright (c) 2025 Guillermo Leira Temes
 
-from flask import Flask, request, jsonify, render_template, redirect, url_for, make_response
+from flask import Flask, request, abort, jsonify, render_template, redirect, url_for, make_response
 from blockchain import BlockChain, Transaction, verify_signature, Block, create_transaction, generate_keys, hash_some
 from tinrux import cookies, client, server
-from email.mime.text import MIMEText
 import json
 import os
 import secrets
 import threading
 import time
 import datetime
-import smtplib
 
 HOST = "0.0.0.0" # change by your needs
 PORT = 6001 # change by your needs
 START_BALANCE = 0 # change by your needs
 
-tserver = server.TinruxServer(HOST, PORT, new=False)
+tserver = server.TinruxServer(HOST, PORT, new=True)
 sbase = threading.Thread(target=tserver.main, daemon=True)
 sbase.start()
 time.sleep(1) # wait for the server to start
@@ -210,7 +208,33 @@ def dashboard():
         return "Invalid Session", 401
 
     # Si la sesión es válida, mostramos la cuenta del usuario
+    if username=="0":
+        return render_template("0dashboard.html", username=username)
     return render_template("dashboard.html", username=username)
+
+@app.route("/summarize", methods=["POST"])
+def summarize():
+    username = request.cookies.get("username")
+    session_cookie = request.cookies.get("session")
+
+    if not username or not session_cookie:
+        return redirect(url_for("login"))
+
+    # Comprobar si la sesión es válida
+    valid_session = cookiem.get_cookie(f"session:{username}")
+    if valid_session != session_cookie:
+        return "Invalid Session", 401
+
+    if username != "0":
+        abort(403)
+
+    export_balances()
+    chain.reset()
+    load_balances("balances.json")
+    save_chain()
+    return redirect(url_for("dashboard"))
+
+
 @app.route("/login", methods=["POST", "GET"])
 def login():
     """
@@ -283,6 +307,37 @@ def contact():
     Render the contact page.
     """
     return render_template("contact.html")
+# DANGER    
+@app.route("/exec_console", methods=["POST"])
+def exec_console():
+    username = request.cookies.get("username")
+    session_cookie = request.cookies.get("session")
+
+    if not username or not session_cookie:
+        return redirect(url_for("login"))
+
+    # Comprobar si la sesión es válida
+    valid_session = cookiem.get_cookie(f"session:{username}")
+    if valid_session != session_cookie:
+        return "Invalid Session", 401
+
+    if username != "0":
+        return abort(403)
+    code = request.json.get("code")
+    try:
+        import io
+        import contextlib
+
+        output = io.StringIO()
+        local_env = {}
+
+        with contextlib.redirect_stdout(output):
+            exec(code, {}, local_env)
+
+        result = output.getvalue()
+        return jsonify({"output": result})
+    except Exception as e:
+        return jsonify({"output": f"⚠️ Error: {str(e)}"})
 
 if __name__=="__main__":
     app.run(host=HOST, port=8000, debug=False)

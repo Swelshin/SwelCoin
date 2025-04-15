@@ -114,6 +114,9 @@ class BlockChain:
                 self.chain.append(block)
             else:
                 raise ValueError("Invalid previous hash")
+    def reset(self):
+        self.index = 0
+        self.chain = []
 def generate_keys():
     key = RSA.generate(2048)
     private_key = key.export_key()
